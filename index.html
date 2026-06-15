@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Avance de Carrera</title>
+
+<style>
+
+body{
+    margin:0;
+    padding:20px;
+    background:#1e1e1e;
+    color:white;
+    font-family:Arial,sans-serif;
+}
+
+.card{
+    background:#2b2b2b;
+    padding:15px;
+    border-radius:15px;
+    margin-bottom:20px;
+}
+
+input,button{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:none;
+    border-radius:10px;
+    background:#3a3a3a;
+    color:white;
+    font-size:16px;
+    box-sizing:border-box;
+}
+
+button{
+    background:#4caf50;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+.reset-btn{
+    background:#ff5555;
+}
+
+.progress{
+    width:100%;
+    height:30px;
+    background:#3a3a3a;
+    border-radius:15px;
+    overflow:hidden;
+    margin-top:10px;
+}
+
+.progress-fill{
+    height:100%;
+    background:#4caf50;
+}
+
+.big{
+    font-size:24px;
+    font-weight:bold;
+}
+
+.history-item{
+    padding:8px;
+    border-bottom:1px solid #444;
+}
+
+.delta{
+    color:#4caf50;
+}
+
+.warning{
+    color:#ffcc00;
+    font-weight:bold;
+}
+
+<link
+    rel="apple-touch-icon"
+    href="icon.png"
+>
+
+<link
+    rel="icon"
+    href="icon.png"
+>
+
+</style>
+</head>
+
+<body>
+
+<h1>🎓 Ingeniería Electrónica</h1>
+
+<div class="card">
+
+    <h2>Actualizar avance</h2>
+
+    <input
+        id="porcentaje"
+        type="number"
+        step="0.01"
+        placeholder="43.13"
+    >
+
+    <button onclick="actualizarPorcentaje()">
+        Guardar avance
+    </button>
+
+</div>
+
+<div class="card">
+
+    <h2>Progreso</h2>
+
+    <div id="actual" class="big"></div>
+
+    <div class="progress">
+        <div
+            id="barra"
+            class="progress-fill"
+            style="width:0%"
+        ></div>
+    </div>
+
+</div>
+
+<div class="card">
+
+    <h2>Próxima meta</h2>
+
+    <div id="meta"></div>
+
+</div>
+
+<div class="card">
+
+    <h2>Historial</h2>
+
+    <div id="historial"></div>
+
+</div>
+
+<div class="card">
+
+    <button
+        class="reset-btn"
+        onclick="resetearTodo()"
+    >
+        RESET
+    </button>
+
+</div>
+
+<script>
+
+let data =
+JSON.parse(
+    localStorage.getItem("avance_carrera")
+)
+||
+{
+    actual:0,
+    historial:[]
+};
+
+function guardar(){
+
+    localStorage.setItem(
+        "avance_carrera",
+        JSON.stringify(data)
+    );
+
+}
+
+function fechaActual(){
+
+    return new Date().toLocaleString(
+        "es-AR"
+    );
+
+}
+
+function actualizarPorcentaje(){
+
+    let nuevo =
+    parseFloat(
+        document.getElementById("porcentaje").value
+            .replace(",", ".")
+    );
+
+    if(isNaN(nuevo)) return;
+
+    if(nuevo < 0 || nuevo > 100){
+        alert("El porcentaje debe estar entre 0 y 100");
+        return;
+    }
+
+    let viejo = data.actual;
+
+    if(
+        !confirm(
+            `Cambiar avance de ${viejo.toFixed(2)}% a ${nuevo.toFixed(2)}% ?`
+        )
+    ){
+        return;
+    }
+
+    data.actual = nuevo;
+
+    data.historial.unshift({
+
+        fecha: fechaActual(),
+        valor: nuevo,
+        diferencia: nuevo - viejo
+
+    });
+
+    guardar();
+    render();
+
+    document.getElementById("porcentaje").value = "";
+
+}
+
+function render(){
+
+    document.getElementById("actual")
+    .innerHTML =
+    `${data.actual.toFixed(2)}%`;
+
+    document.getElementById("barra")
+    .style.width =
+    `${data.actual}%`;
+
+    let falta =
+    Math.max(
+        0,
+        50 - data.actual
+    );
+
+    document.getElementById("meta")
+    .innerHTML =
+    data.actual >= 50
+    ?
+    "✅ Ya alcanzaste el 50%"
+    :
+    `Falta para 50%: <span class="warning">${falta.toFixed(2)}%</span>`;
+
+    let h =
+    document.getElementById("historial");
+
+    h.innerHTML = "";
+
+    data.historial.forEach(x=>{
+
+        let delta = "";
+
+        if(x.diferencia > 0){
+
+            delta =
+            `<span class="delta">
+                (+${x.diferencia.toFixed(2)}%)
+            </span>`;
+
+        }
+
+        h.innerHTML += `
+        <div class="history-item">
+
+            <div>
+                ${x.fecha}
+            </div>
+
+            <div>
+                ${x.valor.toFixed(2)}%
+                ${delta}
+            </div>
+
+        </div>
+        `;
+
+    });
+
+}
+
+function resetearTodo(){
+
+    if(
+        !confirm(
+            "¿Seguro que querés borrar todo?"
+        )
+    ){
+        return;
+    }
+
+    data =
+    {
+        actual:0,
+        historial:[]
+    };
+
+    guardar();
+    render();
+
+}
+
+render();
+
+</script>
+
+</body>
+</html>
