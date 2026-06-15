@@ -96,17 +96,15 @@ button:hover{
 
 <body>
 
-<h1>🎓 Ingeniería Electrónica</h1>
-
+<h1 id="titulo"></h1>
 <div class="card">
 
     <h2>Actualizar avance</h2>
 
     <input
-        id="porcentaje"
-        type="number"
-        step="0.01"
-        placeholder="43.13"
+    id="porcentaje"
+    placeholder="00,00"
+    inputmode="decimal"
     >
 
     <button onclick="actualizarPorcentaje()">
@@ -166,6 +164,7 @@ JSON.parse(
 )
 ||
 {
+    titulo:"Ingeniería Electrónica",
     actual:0,
     historial:[]
 };
@@ -189,6 +188,15 @@ function fechaActual(){
 
 function actualizarPorcentaje(){
 
+    <input
+        id="nuevoTitulo"
+        placeholder="Nombre de la carrera o proyecto"
+    >
+
+    <button onclick="cambiarTitulo()">
+        Cambiar título
+    </button>
+    
     let nuevo =
     parseFloat(
         document.getElementById("porcentaje").value
@@ -229,8 +237,36 @@ function actualizarPorcentaje(){
 
 }
 
+function cambiarTitulo(){
+
+    let nuevo =
+    document.getElementById("nuevoTitulo")
+    .value.trim();
+
+    if(!nuevo) return;
+
+    if(
+        !confirm(
+            `¿Cambiar título a "${nuevo}"?`
+        )
+    ){
+        return;
+    }
+
+    data.titulo = nuevo;
+
+    guardar();
+    render();
+
+    document.getElementById("nuevoTitulo").value = "";
+}
+    
 function render(){
 
+    document.getElementById("titulo")
+    .innerHTML =
+    "🎓 " + data.titulo;
+    
     document.getElementById("actual")
     .innerHTML =
     `${data.actual.toFixed(2)}%`;
