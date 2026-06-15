@@ -168,14 +168,21 @@ button:hover{
 let data =
 JSON.parse(
     localStorage.getItem("avance_carrera")
-)
-||
-{
-    titulo:"Ingeniería Electrónica",
-    actual:0,
-    historial:[]
-};
+);
 
+if(!data){
+
+    data = {
+        titulo:"Ingeniería Electrónica",
+        actual:0,
+        historial:[]
+    };
+
+}
+
+if(!data.titulo){
+    data.titulo = "Ingeniería Electrónica";
+}
 function guardar(){
 
     localStorage.setItem(
