@@ -100,7 +100,14 @@ button:hover{
 <div class="card">
 
     <h2>Actualizar avance</h2>
+    <input
+        id="nuevoTitulo"
+        placeholder="Nombre de la carrera o proyecto"
+    >
 
+    <button onclick="cambiarTitulo()">
+        Cambiar título
+    </button>
     <input
     id="porcentaje"
     placeholder="00,00"
@@ -187,15 +194,6 @@ function fechaActual(){
 }
 
 function actualizarPorcentaje(){
-
-    <input
-        id="nuevoTitulo"
-        placeholder="Nombre de la carrera o proyecto"
-    >
-
-    <button onclick="cambiarTitulo()">
-        Cambiar título
-    </button>
     
     let nuevo =
     parseFloat(
